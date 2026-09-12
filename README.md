@@ -4,6 +4,15 @@ Spring Boot (Java 17) + PostgreSQL wallet/P2P-transfer service. See [WRITEUP.md]
 one-page design write-up (data model, mechanism choices, idempotency placement,
 consistency-vs-availability, AI directed-vs-decided).
 
+## Submission
+
+- **Live URL:** https://wallet-transfer-e5cr.onrender.com
+- **Public repo:** https://github.com/nikhilbn003/Paytm_assment_wallet_transfer
+- **Public logs:** <!-- TODO: paste Render's public Logs tab link here, or a screen-recording link -->
+- **One-command burst script:** [`scripts/burst.sh`](scripts/burst.sh) (see "Run the burst scripts" below)
+- **Write-up:** [WRITEUP.md](WRITEUP.md)
+- **Free-tier cost:** ₹0 (Render free web service + Render free Postgres)
+
 ## API
 
 Auth: `Authorization: Bearer <token>` — the token identifies the calling user (minimal by design;
@@ -25,7 +34,63 @@ auth sophistication isn't graded in this round).
 docker compose up --build
 ```
 
-This brings up Postgres + the app (Flyway migrates the schema on boot). API at `http://localhost:8080`.
+This brings up Postgres + the app (Hibernate creates/updates the schema on boot from the
+`*JpaEntity` classes). API at `http://localhost:8080`.
+
+## curl examples
+
+Set `BASE_URL` once (defaults shown are for the live deployment; use `http://localhost:8080` for a
+local run):
+
+```bash
+BASE_URL=https://wallet-transfer-e5cr.onrender.com
+```
+
+**Get-or-create a wallet** (the bearer token is any string identifying the caller):
+
+```bash
+curl -s -X POST "$BASE_URL/wallets" \
+  -H "Authorization: Bearer alice"
+# {"id":"<wallet-id>","user_id":"alice","balance_paise":0}
+```
+
+**Check a wallet's balance:**
+
+```bash
+curl -s "$BASE_URL/wallets/<wallet-id>" \
+  -H "Authorization: Bearer alice"
+```
+
+**Seed a wallet with funds** (test-only helper, not one of the 4 spec endpoints):
+
+```bash
+curl -s -X POST "$BASE_URL/wallets/<wallet-id>/deposit" \
+  -H "Authorization: Bearer alice" -H "Content-Type: application/json" \
+  -d '{"amount_paise": 100000}'
+```
+
+**Transfer between two wallets** (`idempotency_key` must be unique per logical transfer; retrying
+the same key+body returns the original result, same key+different body returns `409`):
+
+```bash
+curl -s -X POST "$BASE_URL/transfers" \
+  -H "Authorization: Bearer alice" -H "Content-Type: application/json" \
+  -d '{"from":"<from-wallet-id>","to":"<to-wallet-id>","amount_paise":1000,"idempotency_key":"txn-001"}'
+```
+
+**Check a transfer's status:**
+
+```bash
+curl -s "$BASE_URL/transfers/<transfer-id>" \
+  -H "Authorization: Bearer alice"
+```
+
+**Health and metrics** (no auth required):
+
+```bash
+curl -s "$BASE_URL/actuator/health"
+curl -s "$BASE_URL/actuator/prometheus"
+```
 
 ## Run the burst scripts
 
