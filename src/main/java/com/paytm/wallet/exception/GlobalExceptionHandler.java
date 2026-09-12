@@ -6,6 +6,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -42,6 +43,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleTypeMismatch(MethodArgumentTypeMismatchException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(error("'" + e.getName() + "' is not a valid " + e.getRequiredType().getSimpleName().toLowerCase()));
+    }
+
+    /** An unmapped route (typo'd path, wrong method, etc.) - a plain 404, not a 500. */
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<Map<String, String>> handleNoResource(NoResourceFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error("no such route"));
     }
 
     @ExceptionHandler(Exception.class)

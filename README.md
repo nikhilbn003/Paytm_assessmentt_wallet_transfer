@@ -59,22 +59,22 @@ BASE_URL=https://wallet-transfer-e5cr.onrender.com
 
 ```bash
 curl -s -X POST "$BASE_URL/wallets" \
-  -H "Authorization: Bearer alice"
-# {"id":"<wallet-id>","user_id":"alice","balance_paise":0}
+  -H "Authorization: Bearer nikhil"
+# {"id":"<wallet-id>","user_id":"nikhil","balance_paise":0}
 ```
 
 **Check a wallet's balance:**
 
 ```bash
 curl -s "$BASE_URL/wallets/<wallet-id>" \
-  -H "Authorization: Bearer alice"
+  -H "Authorization: Bearer nikhil"
 ```
 
 **Seed a wallet with funds** (test-only helper, not one of the 4 spec endpoints):
 
 ```bash
 curl -s -X POST "$BASE_URL/wallets/<wallet-id>/deposit" \
-  -H "Authorization: Bearer alice" -H "Content-Type: application/json" \
+  -H "Authorization: Bearer nikhil" -H "Content-Type: application/json" \
   -d '{"amount_paise": 100000}'
 ```
 
@@ -83,7 +83,7 @@ the same key+body returns the original result, same key+different body returns `
 
 ```bash
 curl -s -X POST "$BASE_URL/transfers" \
-  -H "Authorization: Bearer alice" -H "Content-Type: application/json" \
+  -H "Authorization: Bearer nikhil" -H "Content-Type: application/json" \
   -d '{"from":"<from-wallet-id>","to":"<to-wallet-id>","amount_paise":1000,"idempotency_key":"txn-001"}'
 ```
 
@@ -91,7 +91,7 @@ curl -s -X POST "$BASE_URL/transfers" \
 
 ```bash
 curl -s "$BASE_URL/transfers/<transfer-id>" \
-  -H "Authorization: Bearer alice"
+  -H "Authorization: Bearer nikhil"
 ```
 
 **Health and metrics** (no auth required):
