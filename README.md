@@ -10,6 +10,15 @@ consistency-vs-availability, AI directed-vs-decided).
 - **Public repo:** https://github.com/nikhilbn003/Paytm_assment_wallet_transfer
 - **Public logs:** <!-- TODO: paste Render's public Logs tab link here, or a screen-recording link -->
 - **One-command burst script:** [`scripts/burst.sh`](scripts/burst.sh) (see "Run the burst scripts" below)
+mkdir -p burst-scripts && cd burst-scripts
+curl -fsSL -o burst.sh https://raw.githubusercontent.com/nikhilbn003/Paytm_assment_wallet_transfer/main/scripts/burst.sh
+curl -fsSL -o 01-concurrent-get-or-create.sh https://raw.githubusercontent.com/nikhilbn003/Paytm_assment_wallet_transfer/main/scripts/01-concurrent-get-or-create.sh
+curl -fsSL -o 02-idempotent-retry-storm.sh https://raw.githubusercontent.com/nikhilbn003/Paytm_assment_wallet_transfer/main/scripts/02-idempotent-retry-storm.sh
+curl -fsSL -o 03-conservation-under-contention.sh https://raw.githubusercontent.com/nikhilbn003/Paytm_assment_wallet_transfer/main/scripts/03-conservation-under-contention.sh
+chmod +x *.sh
+BASE_URL=https://wallet-transfer-e5cr.onrender.com bash burst.sh
+
+
 - **Write-up:** [WRITEUP.md](WRITEUP.md)
 - **Free-tier cost:** ₹0 (Render free web service + Render free Postgres)
 
