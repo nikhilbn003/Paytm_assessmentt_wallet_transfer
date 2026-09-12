@@ -1,0 +1,36 @@
+databases:
+  - name: wallet-transfer-db
+    plan: free
+    databaseName: wallet
+    user: wallet
+
+services:
+  - type: web
+    name: wallet-transfer
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: DB_HOST
+        fromDatabase:
+          name: wallet-transfer-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: wallet-transfer-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: wallet-transfer-db
+          property: database
+      - key: DATABASE_USERNAME
+        fromDatabase:
+          name: wallet-transfer-db
+          property: user
+      - key: DATABASE_PASSWORD
+        fromDatabase:
+          name: wallet-transfer-db
+          property: password
+      - key: PORT
+        value: 8080

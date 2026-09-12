@@ -1,0 +1,39 @@
+server:
+  port: ${PORT:8080}
+
+spring:
+  application:
+    name: wallet-transfer
+  datasource:
+    # DATABASE_URL, if set, wins outright (used by docker-compose / most hosts).
+    # Otherwise it's assembled from DB_HOST/DB_PORT/DB_NAME (used on Render, whose managed
+    # Postgres exposes those as separate fields rather than a ready-made JDBC url).
+    url: ${DATABASE_URL:jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:wallet}}
+    username: ${DATABASE_USERNAME:wallet}
+    password: ${DATABASE_PASSWORD:wallet}
+    hikari:
+      maximum-pool-size: ${DB_POOL_SIZE:10}
+  jpa:
+    open-in-view: false
+    hibernate:
+      # Schema is generated/updated from the @Entity classes in domain/*JpaEntity on startup -
+      # this replaces the Flyway-managed migration that used to live here. Entities exist purely
+      # to describe the schema; all actual queries still go through JdbcTemplate repositories.
+      ddl-auto: update
+    show-sql: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+logging:
+  config: classpath:logback-spring.xml
