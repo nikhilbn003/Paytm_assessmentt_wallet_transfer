@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -34,6 +35,13 @@ public class GlobalExceptionHandler {
                 .map(fe -> fe.getField() + ": " + fe.getDefaultMessage())
                 .orElse("validation failed");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error(message));
+    }
+
+    /** e.g. a path variable like /wallets/{id} that isn't a valid UUID - a client error, not a 500. */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<Map<String, String>> handleTypeMismatch(MethodArgumentTypeMismatchException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(error("'" + e.getName() + "' is not a valid " + e.getRequiredType().getSimpleName().toLowerCase()));
     }
 
     @ExceptionHandler(Exception.class)
